@@ -1,6 +1,6 @@
 from typing import List, Generator
 from langchain_google_genai import ChatGoogleGenerativeAI
-from app.schemas import ClauseAnalysis
+from app.analyzer.schemas import ClauseAnalysis
 from app.config import settings
 from app.analyzer.templates import prompt_template
 

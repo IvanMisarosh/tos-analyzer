@@ -7,6 +7,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from app import models
+from app.auth import models as auth_models
 from app.db.db import Base
 from app.config import settings
 
