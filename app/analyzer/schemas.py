@@ -26,3 +26,15 @@ class ClauseAnalysis(BaseModel):
 
     conclusion: str = Field(
         description="Conclusion about the clause so user understands how to proceed")
+
+class ClauseAnalysisResponse(ClauseAnalysis):
+    """Response model for clause analysis with additional metadata."""
+
+    document_id: int = Field(description="ID of the document this clause belongs to")
+    id: str = Field(description="Unique identifier for the clause in the database")
+
+    # class Config:
+    #     from_attributes = True
+    #     json_encoders = {
+    #         enums.RiskLevel: lambda v: v.value
+    #     }
