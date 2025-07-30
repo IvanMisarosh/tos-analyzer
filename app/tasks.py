@@ -5,7 +5,6 @@ from app.analyzer.pdf_parser import PDFParser
 from app.analyzer.llm_analyzer import LLMAnalyzer
 from app.db.db import get_db
 from app.db.sync_mongo import clauses_collection
-import pymupdf
 
 
 @shared_task(bind=True, name="analyze_document")
@@ -23,8 +22,7 @@ def analyze_document(self, document_id: int):
         analyzer = LLMAnalyzer()
         pdf_path = doc_obj.file_url
 
-        doc = pymupdf.open(pdf_path)
-        page_text_gen = parser.iter_text(doc)
+        page_text_gen = parser.iter_text(pdf_path)
         results = analyzer.analyze_document_per_page(page_text_gen)
 
         for clause_analysis in results:

@@ -72,7 +72,7 @@ async def start_analysis(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to start analysis task"
             )
-    else:         
+    else:
         return {"status": db_document.status}
 
 
@@ -103,5 +103,5 @@ async def get_clauses(
     async for clause in cursor:
         clause["id"] = str(clause["_id"])
         analysis.append(schemas.ClauseAnalysisResponse(**clause))
-    
+
     return analysis

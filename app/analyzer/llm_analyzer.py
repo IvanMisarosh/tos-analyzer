@@ -1,4 +1,4 @@
-from typing import List, Generator
+from typing import Generator
 from langchain_google_genai import ChatGoogleGenerativeAI
 from app.analyzer.schemas import ClauseAnalysis
 from app.config import settings
@@ -16,10 +16,10 @@ class LLMAnalyzer:
 
         self.chain = prompt_template | self.structured_llm
 
-    def analyze_document_per_page(self, page_text_gen: Generator[str]) -> List[ClauseAnalysis]:
+    def analyze_document_per_page(
+            self, page_text_gen: Generator[str]) -> Generator[ClauseAnalysis, None, None]:
         """Analyze a PDF document using the generator from PDFParser."""
-        results = []
+
         for page_text in page_text_gen:
             analysis = self.chain.invoke({"text": page_text})
-            results.append(analysis)
-        return results
+            yield analysis
