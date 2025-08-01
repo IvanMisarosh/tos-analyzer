@@ -58,7 +58,7 @@ async def start_analysis(
             detail="Document not found"
         )
 
-    if db_document.status == DocumentStatus.UPLOADED:
+    if db_document.status == DocumentStatus.UPLOADED or db_document.status == DocumentStatus.FAILED:
         try:
             analyze_document.delay(document_id)
             db_document.status = DocumentStatus.QUED_FOR_ANALYSIS

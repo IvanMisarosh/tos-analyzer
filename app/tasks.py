@@ -1,43 +1,29 @@
 from celery import shared_task
-from app.models import Document
 from app.enums import DocumentStatus
-from app.analyzer.pdf_parser import PDFParser
-from app.analyzer.llm_analyzer import LLMAnalyzer
 from app.db.db import get_db
-from app.db.sync_mongo import clauses_collection
+from app.analyzer.document_repository import DocumentRepository
+from app import utils
 
 
 @shared_task(bind=True, name="analyze_document")
 def analyze_document(self, document_id: int):
     session = next(get_db())
+    document_repo = DocumentRepository(session)
     try:
-        doc_obj = session.query(Document).filter(Document.id == document_id).first()
-        if not doc_obj:
+        doc = document_repo.get_by_id(document_id)
+        if not doc:
             return
 
-        doc_obj.status = DocumentStatus.PROCESSING
-        session.commit()
+        document_repo.update_status(doc, DocumentStatus.PROCESSING)
 
-        parser = PDFParser()
-        analyzer = LLMAnalyzer()
-        pdf_path = doc_obj.file_url
+        service = utils.create_analyzer_service()
 
-        page_text_gen = parser.iter_text(pdf_path)
-        results = analyzer.analyze_document_per_page(page_text_gen)
+        results = service.analyze(pdf_path=doc.file_url, user_context=doc.user_context or "")
+        utils.save_results(results, document_id)
 
-        for clause_analysis in results:
-            dict_clause = clause_analysis.model_dump()
-            dict_clause["document_id"] = document_id
-            clauses_collection.insert_one(dict_clause)
-
-        doc_obj.status = DocumentStatus.ANALYZED
-        session.commit()
-
+        document_repo.update_status(doc, DocumentStatus.ANALYZED)
     except Exception as e:
-        doc_obj = session.query(Document).filter(Document.id == document_id).first()
-        if doc_obj:
-            doc_obj.status = DocumentStatus.FAILED
-            session.commit()
+        document_repo.update_status(doc, DocumentStatus.FAILED)
         raise e
     finally:
         session.close()

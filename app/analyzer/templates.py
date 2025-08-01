@@ -13,6 +13,11 @@ Your task is to analyze the following clause and classify it according to predef
 categories and risk levels, with a focus on identifying any terms
 that may negatively impact or limit user rights.
 
+Here is context provided by the user
+(You can use it to better understand the user's perspective):
+USER CONTEXT: 
+\"\"\"{{user_context}}\"\"\"
+
 Clause:
 \"\"\"{{text}}\"\"\"
 
@@ -25,6 +30,16 @@ Instructions:
 - ONLY assign a category if the clause directly pertains to it.
 - If the clause does not unambiguously match any of the categories, return an empty list
     for categories.
+- Determine if the clause is valid and coherent. If it appears broken, malformed, or incomplete,
+    set `is_valid` to false. Here are some examples of what to look for:
+    Example 1 — Valid:
+    Clause Text: "You may cancel your subscription at any time through your account settings."
+    is_valid: true
+
+    Example 2 — Invalid:
+    Clause Text: "A. PRIVACY B. DATA C. TERMINATION E. THIRD PARTY the cookie you accept clause not user"
+    is_valid: false
+                    
 
 Allowed categories: {', '.join(CATEGORIES)}
 Allowed risk levels: {', '.join(RISK_LEVELS)}
