@@ -33,25 +33,25 @@ class ClauseAnalysis(BaseModel):
 
     conclusion: str = Field(
         description="Conclusion about the clause so user understands how to proceed")
-    
+
     is_valid: bool = Field(
         description=(
             "Set to **false** if the clause appears to be broken, malformed, or incomplete. "
             "For example, clauses that contain random or merged headings, unrelated topics, or "
             "gibberish text. The clause should be readable, coherent, and contain complete ideas. "
-            "If it looks like multiple sections got mashed together or lacks logical structure, mark it as false."
+            "If it looks like multiple sections got mashed together or lacks logical "
+            "structure, mark it as false."
         )
     )
-    
+
 
 class ChapterAnalysis(ClauseAnalysis):
     """Analysis result for a chapter in the Terms & Conditions document."""
 
-    chapter_name: Optional[str] = Field(description="Name of the chapter being analyzed")
-    page_start: Optional[int] = Field(
-        default=None, description="Starting page of the chapter")
-    page_end: Optional[int] = Field(
-        default=None, description="Ending page of the chapter")
+    chapter_name: Optional[str] = Field(default=None,
+                                        description="Name of the chapter being analyzed")
+    page_start: Optional[int] = Field(default=None, description="Starting page of the chapter")
+    page_end: Optional[int] = Field(default=None, description="Ending page of the chapter")
 
 
 class ClauseAnalysisResponse(ChapterAnalysis):

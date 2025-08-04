@@ -1,4 +1,3 @@
-# app/repositories/document_repository.py
 from app.models import Document
 from app.enums import DocumentStatus
 from sqlalchemy.orm import Session

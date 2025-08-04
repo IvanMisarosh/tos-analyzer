@@ -1,3 +1,4 @@
+import asyncio
 from celery import shared_task
 from app.enums import DocumentStatus
 from app.db.db import get_db
@@ -18,8 +19,11 @@ def analyze_document(self, document_id: int):
 
         service = utils.create_analyzer_service()
 
-        results = service.analyze(pdf_path=doc.file_url, user_context=doc.user_context or "")
-        utils.save_results(results, document_id)
+        results = asyncio.run(
+            service.analyze(
+                pdf_path=doc.file_url,
+                user_context=doc.user_context or ""))
+        asyncio.run(utils.save_results(results, document_id))
 
         document_repo.update_status(doc, DocumentStatus.ANALYZED)
     except Exception as e:
