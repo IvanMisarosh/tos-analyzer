@@ -3,9 +3,15 @@ from app import enums
 from typing import Optional, List
 
 
-class DocumentCreate(BaseModel):
+class Document(BaseModel):
+    id: int
     user_context: Optional[str] = None
     file_url: str
+    status: str
+
+
+class DocumentStatusResponse(BaseModel):
+    id: int
     status: str
 
 

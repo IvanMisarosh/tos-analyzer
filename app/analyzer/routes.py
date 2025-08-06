@@ -13,7 +13,7 @@ from typing import List
 router = APIRouter()
 
 
-@router.post("/document/", response_model=schemas.DocumentCreate)
+@router.post("/document/", response_model=schemas.Document)
 async def upload_document(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -73,7 +73,57 @@ async def start_analysis(
                 detail="Failed to start analysis task"
             )
     else:
-        return {"status": db_document.status}
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Document is already being analyzed or has been analyzed."
+        )
+
+
+@router.get("/document/{document_id}/status", response_model=schemas.DocumentStatusResponse)
+async def get_document_status(
+    document_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    db_document = db.query(models.Document).filter(
+        models.Document.id == document_id,
+        models.Document.user_id == current_user.id
+    ).first()
+    if not db_document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+    return schemas.DocumentStatusResponse(id=db_document.id, status=db_document.status)
+
+
+@router.get("/document/{document_id}", response_model=schemas.Document)
+async def get_document(
+    document_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    db_document = db.query(models.Document).filter(
+        models.Document.id == document_id,
+        models.Document.user_id == current_user.id
+    ).first()
+    if not db_document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+    return db_document
+
+
+@router.get("/documents/", response_model=List[schemas.Document])
+async def get_documents(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    db_documents = db.query(models.Document).filter(
+        models.Document.user_id == current_user.id
+    ).all()
+    return db_documents
 
 
 @router.get("/document/{document_id}/clauses", response_model=List[schemas.ClauseAnalysisResponse])
