@@ -33,8 +33,8 @@ class PDFParser:
         for page in doc:
             yield page.get_text()
 
-    def _is_chapter_valid(self, chapter_text: str):
-        return len(chapter_text) > self.min_chapter_lenght
+    def _is_chapter_valid(self, chapter_text: str) -> bool:
+        return len(chapter_text) >= self.min_chapter_lenght
 
     def has_identifiable_chapters(self, path: str) -> bool:
         doc = pymupdf.open(path)

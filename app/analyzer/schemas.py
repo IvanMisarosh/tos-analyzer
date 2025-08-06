@@ -8,9 +8,6 @@ class DocumentCreate(BaseModel):
     file_url: str
     status: str
 
-    class Config:
-        from_attributes = True
-
 
 class DocumentChapter(BaseModel):
     chapter_name: str
